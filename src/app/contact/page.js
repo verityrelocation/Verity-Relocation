@@ -135,8 +135,8 @@ function ContactInfo() {
         </svg>
       ),
       label: "Phone",
-      value: "(919) 555-0199",
-      href: "tel:+19195550199",
+      value: "(919) 364-3531",
+      href: "tel:+19193643531",
     },
     {
       icon: (
