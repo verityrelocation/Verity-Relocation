@@ -431,7 +431,6 @@ function Footer() {
 export default function ServicesPage() {
   return (
     <div style={{ background: C.parchment, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
       <Nav />
       <PageHero />
       <PricingHero />

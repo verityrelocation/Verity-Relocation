@@ -367,7 +367,6 @@ export default function IntakeFlow() {
 
   return (
     <div style={{ background: C.parchment, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
 
       <nav style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "1.25rem 2.5rem", background: C.parchment, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
