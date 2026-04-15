@@ -25,8 +25,8 @@ export default function Footer() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <span style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", fontWeight: 500 }}>LEGAL</span>
-            <Link href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Privacy policy</Link>
-            <Link href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Terms of service</Link>
+            <Link href="/privacy-policy" style={{ color: "#9FE1CB", textDecoration: "none" }}>Privacy policy</Link>
+            <Link href="/terms-of-service" style={{ color: "#9FE1CB", textDecoration: "none" }}>Terms of service</Link>
             <Link href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Task Authorization</Link>
           </div>
         </div>
