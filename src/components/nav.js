@@ -9,6 +9,7 @@ export default function Nav({ active }) {
     { href: "/how-it-works", label: "How it works" },
     { href: "/services", label: "Services" },
     { href: "/faq", label: "FAQ" },
+    { href: "/contact", label: "Contact" },
   ];
   return (
     <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem 2.5rem", background: C.parchment, borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 100 }}>
