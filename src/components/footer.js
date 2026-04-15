@@ -5,7 +5,7 @@ import { C, Shield } from "./brand";
 export default function Footer() {
   return (
     <footer style={{ background: C.ink, padding: "3rem 2.5rem" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <div className="footer-inner">
         <div>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, textDecoration: "none" }}>
             <Shield size={28} color="#5DCAA5" check="#E8F5EF" />
@@ -16,7 +16,7 @@ export default function Footer() {
           </Link>
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, margin: 0, lineHeight: 1.6 }}>A DBA of Verity Agentic Services LLC<br/>Durham, North Carolina</p>
         </div>
-        <div style={{ display: "flex", gap: 48, fontFamily: "'DM Sans', sans-serif", fontSize: 13 }}>
+        <div className="footer-links" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <span style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", fontWeight: 500 }}>COMPANY</span>
             <Link href="/how-it-works" style={{ color: "#9FE1CB", textDecoration: "none" }}>How it works</Link>

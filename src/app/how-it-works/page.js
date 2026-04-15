@@ -1,47 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-
-const C = {
-  deep: "#0A4D3E",
-  primary: "#1D9E75",
-  mid: "#0F6E56",
-  light: "#E8F5EF",
-  ink: "#1C2B33",
-  parchment: "#F7F5F0",
-  amber: "#C4883A",
-  white: "#FFFFFF",
-  muted: "#7A7A72",
-  border: "#E0DDD5",
-};
-
-function Shield({ size = 36, color = C.deep, check }) {
-  return (
-    <svg width={size} height={size * 1.09} viewBox="-4 0 68 70" fill="none">
-      <path d="M0 2 L58 2 Q62 2 62 6 L62 38 Q62 56 30 66 Q10 60 2 52" stroke={color} strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M10 36 L23 50 L52 18" stroke={check || color} strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
-
-function Nav() {
-  return (
-    <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem 2.5rem", background: C.parchment, borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 100 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Shield size={36} />
-        <div>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: C.deep, lineHeight: 1 }}>Verity</div>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 8, color: C.primary, letterSpacing: "0.18em", fontWeight: 500, marginTop: 1 }}>RELOCATION</div>
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 32, fontFamily: "'DM Sans', sans-serif", fontSize: 14 }}>
-        <a href="#" style={{ color: C.primary, textDecoration: "none", fontWeight: 500 }}>How it works</a>
-        <a href="#" style={{ color: C.ink, textDecoration: "none" }}>Services</a>
-        <a href="#" style={{ color: C.ink, textDecoration: "none" }}>FAQ</a>
-        <button style={{ background: C.deep, color: C.white, border: "none", borderRadius: 6, padding: "10px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>Get started</button>
-      </div>
-    </nav>
-  );
-}
+import Link from "next/link";
+import Nav from "@/components/nav";
+import Footer from "@/components/footer";
+import { C, Shield } from "@/components/brand";
 
 function PageHero() {
   const [vis, setVis] = useState(false);
@@ -256,42 +218,6 @@ function CTASection() {
         <button style={{ background: C.white, color: C.deep, border: "none", borderRadius: 6, padding: "14px 40px", fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, cursor: "pointer" }}>Get started</button>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer style={{ background: C.ink, padding: "3rem 2.5rem" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <Shield size={28} color="#5DCAA5" check="#E8F5EF" />
-            <div>
-              <div style={{ fontFamily: "Georgia, serif", fontSize: 18, color: C.light, lineHeight: 1 }}>Verity</div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 7, color: "#5DCAA5", letterSpacing: "0.18em", fontWeight: 500, marginTop: 1 }}>RELOCATION</div>
-            </div>
-          </div>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, margin: 0, lineHeight: 1.6 }}>A DBA of Verity Agentic Services LLC<br/>Durham, North Carolina</p>
-        </div>
-        <div style={{ display: "flex", gap: 48, fontFamily: "'DM Sans', sans-serif", fontSize: 13 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <span style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", fontWeight: 500 }}>COMPANY</span>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>How it works</a>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Services</a>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>FAQ</a>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <span style={{ color: C.muted, fontSize: 11, letterSpacing: "0.1em", fontWeight: 500 }}>LEGAL</span>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Privacy policy</a>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Terms of service</a>
-            <a href="#" style={{ color: "#9FE1CB", textDecoration: "none" }}>Task Authorization</a>
-          </div>
-        </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "2rem auto 0", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 20, fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.muted }}>
-        {"\u00A9"} 2026 Verity Agentic Services LLC. All rights reserved.
-      </div>
-    </footer>
   );
 }
 
