@@ -14,7 +14,7 @@ function Hero() {
         <div className="hero-left">
           <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 16 }}>RESIDENTIAL MOVE CONCIERGE</div>
           <h1 className="hero-title" style={{ color: C.deep }}>Your move.<br/>Handled.</h1>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, color: C.ink, lineHeight: 1.7, margin: "1.5rem 0 2rem", maxWidth: 480 }}>We activate utilities, schedule your internet install, set up alarm and pest service, and arrange bulk trash pickup &mdash; so you can focus on moving in, not waiting on hold.</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 18, color: C.ink, lineHeight: 1.7, margin: "1.5rem 0 2rem", maxWidth: 480 }}>A typical move means 10+ calls and 5 days of coordination across utilities, internet, alarm, pest, and trash. We take all of it off your plate &mdash; so you can focus on moving in, not waiting on hold.</p>
           <div className="hero-cta-row">
             <Link href="/get-started" style={{ background: C.deep, color: C.white, border: "none", borderRadius: 6, padding: "14px 32px", fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}>Get started</Link>
             <span className="hero-cta-sub" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.muted }}>From $99 &middot; Two flat-fee packages.</span>
@@ -65,7 +65,7 @@ function ServicesPreview() {
       <div className="section-inner" style={{ textAlign: "center" }}>
         <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>SERVICES</div>
         <h2 style={{ fontFamily: "Georgia, serif", fontSize: 36, color: C.deep, margin: "0 0 12px", fontWeight: 400 }}>Two flat fees. Every detail handled.</h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: C.muted, maxWidth: 560, margin: "0 auto 48px", lineHeight: 1.6 }}>Choose the package that matches your move. Every task is verified by a Verity concierge and confirmed in writing before your move date.</p>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: C.muted, maxWidth: 560, margin: "0 auto 48px", lineHeight: 1.6 }}>10+ calls. 5 days of coordination. One flat fee. Choose the package that matches your move &mdash; every task is verified by a Verity concierge and confirmed in writing before your move date.</p>
         <div className="grid-2" style={{ maxWidth: 880, margin: "0 auto" }}>
           {[
             {
@@ -126,7 +126,7 @@ function TrustBar() {
   return (
     <section style={{ background: C.deep }} className="section-padding" >
       <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 40, alignItems: "center", textAlign: "center" }}>
-        {[{ num: "From $99", label: "Flat fee, no subscriptions" }, { num: "4\u20137 hrs", label: "Of phone calls eliminated" }, { num: "Triangle & RTP", label: "Residential service area" }].map((s, i) => (
+        {[{ num: "10+ calls", label: "Eliminated per move" }, { num: "5 days", label: "Of coordination, compressed to one intake" }, { num: "Move-in ready", label: "Every account active before you arrive" }].map((s, i) => (
           <div key={i} style={{ textAlign: "center" }}>
             <div style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.white, marginBottom: 6 }}>{s.num}</div>
             <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#9FE1CB" }}>{s.label}</div>
@@ -142,7 +142,7 @@ function HomeFAQ() {
   const faqs = [
     { q: "What exactly does Verity do?", a: "We coordinate utility activation and disconnection (electric, natural gas, municipal water), internet service provider scheduling, home alarm setup, pest control setup, and bulk trash pickup on your behalf. You sign a simple Task Authorization and we handle every call, portal submission, and scheduling confirmation." },
     { q: "Is my personal information safe?", a: "Yes. Your SSN and driver\u2019s license number are stored in an encrypted PII vault (Skyflow) and automatically purged 24 hours after your engagement is complete. This data is tokenized \u2014 it never enters our standard database. Payments are processed through Stripe\u2019s hosted checkout." },
-    { q: "How is this different from a checklist app?", a: "Checklist apps tell you what to do. We do it. You don\u2019t make a single phone call, navigate a single portal, or wait on hold. We execute the provider interactions end-to-end." },
+    { q: "How is this different from a checklist app?", a: "Checklist apps tell you what to do. We do it. A typical move means 10+ separate calls across utilities, internet, alarm, pest, and trash &mdash; spread over 5 days of coordination, deposits, hold times, and missed callbacks. You don't make a single phone call, navigate a single portal, or wait on hold. We execute the provider interactions end-to-end and send you written confirmation for every account." },
     { q: "Do I need to share my login credentials?", a: "No. We create new accounts or manage service requests directly with providers using your Task Authorization. We never ask for or store your existing login credentials." },
     { q: "My attorney recommended Verity. Why?", a: "Closing attorneys see every client go through the same painful utility setup. Verity gives them a way to solve that problem with a single recommendation. Our co-marketing structure is fully RESPA Section 8 compliant." },
   ];
