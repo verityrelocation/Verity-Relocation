@@ -1,279 +1,360 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import Link from "next/link";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
 import { C, Shield } from "@/components/brand";
 
-function PageHero() {
-  const [vis, setVis] = useState(false);
-  useEffect(() => { setTimeout(() => setVis(true), 100); }, []);
-  return (
-    <section style={{ background: C.ink, padding: "5rem 2.5rem 4.5rem", opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(16px)", transition: "all 0.7s ease" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 16 }}>HOW IT WORKS</div>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 44, color: C.white, lineHeight: 1.2, margin: "0 0 1.25rem", fontWeight: 400 }}>You sign once.<br/>We handle everything else.</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "#9FE1CB", lineHeight: 1.7, margin: 0, maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>From the moment you authorize Verity, you never wait on hold, navigate a portal, or schedule an appointment. Here's what happens behind the scenes.</p>
-      </div>
-    </section>
-  );
-}
-
-function StepSection({ num, title, description, details, visual, reverse }) {
-  const [vis, setVis] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setVis(true), 200);
-    return () => clearTimeout(t);
-  }, []);
-
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 64,
-      flexDirection: reverse ? "row-reverse" : "row",
-      padding: "4rem 0",
-      opacity: vis ? 1 : 0,
-      transform: vis ? "translateY(0)" : "translateY(20px)",
-      transition: "all 0.6s ease",
-    }}>
-      <div style={{ flex: 1.1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-          <div style={{ width: 40, height: 40, borderRadius: "50%", background: C.light, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: C.deep }}>{num}</div>
-          <div style={{ height: 1, flex: 1, background: C.border }} />
-        </div>
-        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep, margin: "0 0 12px", fontWeight: 400 }}>{title}</h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: C.ink, lineHeight: 1.75, margin: "0 0 20px" }}>{description}</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {details.map((d, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                <path d="M4 9.5L7.5 13L14 5" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{d}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div style={{ flex: 1 }}>
-        {visual}
-      </div>
-    </div>
-  );
-}
-
-function IntakeVisual() {
-  return (
-    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: "28px 24px", maxWidth: 360 }}>
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.1em", fontWeight: 500, marginBottom: 16 }}>SERVICE SELECTION</div>
-      {["Moving to NC", "Leaving NC", "Moving within NC"].map((opt, i) => (
-        <label key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 8, border: `1px solid ${i === 0 ? C.primary : C.border}`, background: i === 0 ? C.light : C.white, marginBottom: 8, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink }}>
-          <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${i === 0 ? C.primary : C.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {i === 0 && <div style={{ width: 10, height: 10, borderRadius: "50%", background: C.primary }} />}
-          </div>
-          {opt}
-        </label>
-      ))}
-      <div style={{ marginTop: 16 }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginBottom: 6 }}>Property address</div>
-        <div style={{ padding: "10px 14px", borderRadius: 6, border: `1px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink }}>123 Main St, Durham, NC 27701</div>
-      </div>
-    </div>
-  );
-}
-
-function AuthVisual() {
-  return (
-    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: "28px 24px", maxWidth: 360 }}>
-      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.1em", fontWeight: 500, marginBottom: 20 }}>TASK AUTHORIZATION</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {[
-          { text: "Authorize Verity to contact utility providers on my behalf", checked: true },
-          { text: "Authorize Verity to schedule internet installation on my behalf", checked: true },
-        ].map((item, i) => (
-          <label key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.5, cursor: "pointer" }}>
-            <div style={{ width: 20, height: 20, borderRadius: 4, background: item.checked ? C.primary : C.white, border: `1.5px solid ${item.checked ? C.primary : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-              {item.checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9L9.5 3.5" stroke={C.white} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-            </div>
-            {item.text}
-          </label>
-        ))}
-      </div>
-      <div style={{ marginTop: 20, padding: "12px 16px", background: C.light, borderRadius: 8 }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid, fontWeight: 500, marginBottom: 4 }}>NOT a power of attorney</div>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, lineHeight: 1.5 }}>This is a limited Task Authorization executed under UETA with a 24-hour revocation clause.</div>
-      </div>
-      <button style={{ marginTop: 16, width: "100%", background: C.deep, color: C.white, border: "none", borderRadius: 6, padding: "12px", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, cursor: "pointer" }}>Sign and continue — $199</button>
-    </div>
-  );
-}
-
-function TrackingVisual() {
-  const items = [
-    { provider: "Duke Energy", status: "Active", detail: "Confirmed 11:42am", color: C.primary },
-    { provider: "Google Fiber", status: "Scheduled", detail: "June 3, 9am–1pm", color: C.amber },
-    { provider: "Piedmont Gas", status: "Active", detail: "Confirmed 2:18pm", color: C.primary },
-    { provider: "Durham Water", status: "In progress", detail: "Submitted, awaiting confirm", color: C.amber },
-  ];
-  return (
-    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, padding: "28px 24px", maxWidth: 380 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.1em", fontWeight: 500 }}>YOUR STATUS</div>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.muted }}>Via WhatsApp</div>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-        {items.map((item, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", borderTop: i > 0 ? `1px solid ${C.border}` : "none" }}>
-            <div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>{item.provider}</div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.muted, marginTop: 2 }}>{item.detail}</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: item.color }} />
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 500, color: item.color }}>{item.status}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Timeline() {
-  return (
-    <section style={{ background: C.parchment, padding: "4rem 2.5rem 2rem" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>TYPICAL TIMELINE</div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.deep, margin: 0, fontWeight: 400 }}>From sign-up to lights on</h2>
-        </div>
-        <div style={{ display: "flex", gap: 0, position: "relative" }}>
-          <div style={{ position: "absolute", top: 20, left: "10%", right: "10%", height: 2, background: C.border }} />
-          {[
-            { time: "Day 0", label: "Sign up + pay", detail: "ISP scheduling begins immediately" },
-            { time: "Day 0–1", label: "Notarization", detail: "5 minutes on your phone" },
-            { time: "Day 1–2", label: "Utilities activated", detail: "Duke, gas, water confirmed" },
-            { time: "Day 3–14", label: "ISP installed", detail: "Technician visit confirmed" },
-          ].map((step, i) => (
-            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 1 }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: i === 3 ? C.primary : C.white, border: `2px solid ${i === 3 ? C.primary : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                {i === 3 ? (
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9.5L7.5 13L14 5" stroke={C.white} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                ) : (
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.primary }} />
-                )}
-              </div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, fontWeight: 500, marginBottom: 4 }}>{step.time}</div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink, textAlign: "center", marginBottom: 4 }}>{step.label}</div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, textAlign: "center", maxWidth: 160 }}>{step.detail}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function WhatWeHandle() {
-  const providers = [
-    { name: "Duke Energy", type: "Electric", actions: "New service, transfers, disconnection" },
-    { name: "Piedmont Natural Gas", type: "Gas", actions: "New service, transfers, disconnection" },
-    { name: "City of Durham Water", type: "Water", actions: "Activation, final billing" },
-    { name: "City of Raleigh Utilities", type: "Water", actions: "Activation, final billing" },
-    { name: "Google Fiber", type: "Internet", actions: "New install scheduling" },
-    { name: "AT&T Fiber", type: "Internet", actions: "New install scheduling" },
-    { name: "Spectrum", type: "Internet", actions: "New install, transfers" },
-  ];
-
-  return (
-    <section style={{ background: C.white, padding: "4.5rem 2.5rem" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>PROVIDERS WE HANDLE</div>
-        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.deep, margin: "0 0 2rem", fontWeight: 400 }}>Every provider at your Triangle address</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
-          {providers.map((p, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderBottom: `1px solid ${C.border}`, borderRight: i % 2 === 0 ? `1px solid ${C.border}` : "none" }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: C.light, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-              <div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>{p.name}</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted }}>{p.actions}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTASection() {
-  return (
-    <section style={{ background: C.deep, padding: "4.5rem 2.5rem", textAlign: "center" }}>
-      <div style={{ maxWidth: 600, margin: "0 auto" }}>
-        <Shield size={48} color="#5DCAA5" check="#E8F5EF" />
-        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.white, margin: "1.5rem 0 1rem", fontWeight: 400 }}>Ready to skip the hold music?</h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "#9FE1CB", lineHeight: 1.7, margin: "0 0 2rem" }}>$199 flat fee. All providers. No phone calls. We handle everything from sign-up to confirmation.</p>
-        <button style={{ background: C.white, color: C.deep, border: "none", borderRadius: 6, padding: "14px 40px", fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, cursor: "pointer" }}>Get started</button>
-      </div>
-    </section>
-  );
-}
-
 export default function HowItWorks() {
   return (
-    <div style={{ background: C.parchment, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ background: C.parchment, color: C.ink, minHeight: "100vh" }}>
       <Nav />
-      <PageHero />
 
-      <section style={{ background: C.parchment, padding: "0 2.5rem" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <StepSection
-            num="1"
-            title="Tell us where you're moving"
-            description="Select whether you're moving to NC, leaving NC, or moving within the Triangle. Enter your property address and we automatically identify every utility and internet provider that serves it."
-            details={[
-              "Duke Energy, Piedmont Gas, city water detected by address",
-              "Google Fiber, AT&T Fiber, or Spectrum availability checked",
-              "Service type pre-selected based on your move direction",
-            ]}
-            visual={<IntakeVisual />}
-          />
-          <div style={{ height: 1, background: C.border }} />
-          <StepSection
-            num="2"
-            title="Authorize and pay"
-            description="Review and sign a two-checkbox Task Authorization — not a power of attorney. Provide your SSN and driver's license for provider verification (encrypted vault, 24-hour purge). Pay the $199 flat fee through our secure Stripe checkout."
-            details={[
-              "UETA-compliant electronic signature",
-              "SSN + DL stored in encrypted Skyflow vault only",
-              "24-hour revocation clause included",
-              "ISP scheduling begins the moment you pay",
-            ]}
-            visual={<AuthVisual />}
-            reverse
-          />
-          <div style={{ height: 1, background: C.border }} />
-          <StepSection
-            num="3"
-            title="We handle every provider"
-            description="Our team contacts Duke Energy, Piedmont Gas, your city water department, and coordinates your internet installation. You receive WhatsApp status updates at each milestone — you never make a single phone call."
-            details={[
-              "Portal submissions, phone calls, and scheduling handled",
-              "Real-time WhatsApp / SMS status updates",
-              "Exception handling if a provider needs additional info",
-              "All PII purged 24 hours after completion",
-            ]}
-            visual={<TrackingVisual />}
-          />
+      <section className="page-head">
+        <div className="page-head-inner">
+          <div className="eyebrow">How it works</div>
+          <h1>Three steps. One concierge. Everything documented.</h1>
+          <p className="lede">
+            Verity coordinates utility, internet, and home services for residential movers
+            in the Triangle and RTP. Here&rsquo;s exactly what happens from intake to
+            confirmation.
+          </p>
         </div>
       </section>
 
-      <Timeline />
-      <WhatWeHandle />
-      <CTASection />
+      {/* Steps */}
+      <section className="steps">
+        <div className="steps-inner">
+          <article className="step">
+            <div className="step-num">01</div>
+            <div className="step-body">
+              <h2>Tell us about your move</h2>
+              <p>
+                A short intake form captures your move dates, current address, new address,
+                and the package you&rsquo;ve chosen &mdash; Essentials at $99 or Full Move
+                at $199. The form takes about five minutes.
+              </p>
+              <div className="step-detail">
+                <h4>What we ask for</h4>
+                <ul>
+                  <li>Move-out and move-in dates</li>
+                  <li>Old and new addresses</li>
+                  <li>Which services you need (internet, alarm, pest, trash, utilities)</li>
+                  <li>Contact information for confirmations</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article className="step">
+            <div className="step-num">02</div>
+            <div className="step-body">
+              <h2>Verify identity, securely</h2>
+              <p>
+                Utility providers require government-issued identification before they
+                will activate or close an account. We collect your Social Security number
+                and driver&rsquo;s license through an encrypted, isolated vault and use
+                them only for the providers who require them.
+              </p>
+              <div className="step-detail">
+                <h4>How your sensitive data is handled</h4>
+                <ul>
+                  <li>
+                    Encrypted at rest in a dedicated PII vault separate from our
+                    application systems
+                  </li>
+                  <li>
+                    Used only to satisfy provider identity verification &mdash; never sold,
+                    never shared with marketing platforms
+                  </li>
+                  <li>
+                    Sensitive identifiers (SSN, driver&rsquo;s license) are purged within
+                    24 hours of task completion
+                  </li>
+                  <li>
+                    Payment information is handled directly by Stripe; Verity never sees
+                    or stores your card number
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article className="step">
+            <div className="step-num">03</div>
+            <div className="step-body">
+              <h2>Authorize the work</h2>
+              <p>
+                You sign a North Carolina Limited Power of Attorney that lets a Verity
+                concierge contact your selected providers and complete only the tasks
+                you&rsquo;ve authorized. The authorization is narrowly scoped, time-bound,
+                and revocable.
+              </p>
+              <div className="step-detail">
+                <h4>What the authorization covers &mdash; and what it doesn&rsquo;t</h4>
+                <ul>
+                  <li>
+                    <strong>Covers:</strong> Contacting your selected providers, opening or
+                    closing accounts in your name, and scheduling service for the dates
+                    and addresses you provided.
+                  </li>
+                  <li>
+                    <strong>Doesn&rsquo;t cover:</strong> Anything financial. Verity does
+                    not pay deposits, post-pay bills, or move money on your behalf.
+                  </li>
+                  <li>
+                    <strong>Revocable:</strong> You can revoke the authorization at any
+                    time, with a 24-hour notice window for tasks already in progress.
+                  </li>
+                  <li>
+                    <strong>Time-bound:</strong> The authorization expires at the
+                    completion of the move-related tasks you selected.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article className="step">
+            <div className="step-num">04</div>
+            <div className="step-body">
+              <h2>Get written confirmation</h2>
+              <p>
+                We send confirmation of every task we complete &mdash; account numbers,
+                activation dates, install windows, customer service contacts. Your
+                move-in day is unblocked.
+              </p>
+              <div className="step-detail">
+                <h4>What you receive</h4>
+                <ul>
+                  <li>Account numbers for every utility set up</li>
+                  <li>Internet installation appointment confirmation</li>
+                  <li>Alarm, pest, and bulk trash service start dates</li>
+                  <li>A summary email you can forward to a spouse or co-mover</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      {/* Compliance strip */}
+      <section className="compliance">
+        <div className="compliance-inner">
+          <Shield size={48} />
+          <h2>Built on North Carolina compliance</h2>
+          <p>
+            Verity Relocation operates as a DBA of Verity Agentic Services LLC, a North
+            Carolina limited liability company. Our authorization framework is structured
+            under North Carolina&rsquo;s Limited Power of Attorney statutes (N.C.G.S.
+            Chapter 32C), the Uniform Electronic Transactions Act (N.C.G.S. Chapter 66,
+            Article 40), and the Identity Theft Protection Act (N.C.G.S. § 75-65). We
+            don&rsquo;t broker moves, we don&rsquo;t hold customer funds, and we
+            don&rsquo;t practice law.
+          </p>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="cta">
+        <div className="cta-inner">
+          <h2>Start when you&rsquo;re ready</h2>
+          <p>The intake takes about five minutes.</p>
+          <Link href="/get-started" className="btn-primary cta-btn">
+            Start your move
+          </Link>
+        </div>
+      </section>
+
       <Footer />
+
+      <style jsx>{`
+        .page-head {
+          padding: 80px 24px 56px;
+          text-align: center;
+        }
+        .page-head-inner {
+          max-width: 760px;
+          margin: 0 auto;
+        }
+        .eyebrow {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: ${C.amber};
+          margin-bottom: 16px;
+        }
+        h1 {
+          font-family: Georgia, serif;
+          font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: ${C.ink};
+          margin: 0 0 20px;
+        }
+        .lede {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: ${C.ink};
+          opacity: 0.8;
+          margin: 0;
+        }
+
+        .steps {
+          padding: 32px 24px 80px;
+        }
+        .steps-inner {
+          max-width: 880px;
+          margin: 0 auto;
+        }
+        .step {
+          display: grid;
+          grid-template-columns: 100px 1fr;
+          gap: 32px;
+          padding: 40px 0;
+          border-top: 1px solid rgba(28, 43, 51, 0.1);
+        }
+        .step:first-child {
+          border-top: none;
+        }
+        @media (max-width: 720px) {
+          .step {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+        .step-num {
+          font-family: Georgia, serif;
+          font-size: 3rem;
+          font-weight: 700;
+          color: ${C.amber};
+          line-height: 1;
+          letter-spacing: -0.02em;
+        }
+        .step-body h2 {
+          font-family: Georgia, serif;
+          font-size: 1.75rem;
+          color: ${C.ink};
+          margin: 0 0 16px;
+          letter-spacing: -0.01em;
+          line-height: 1.2;
+        }
+        .step-body p {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1.05rem;
+          line-height: 1.65;
+          color: ${C.ink};
+          opacity: 0.85;
+          margin: 0 0 24px;
+        }
+        .step-detail {
+          background: white;
+          border: 1px solid rgba(28, 43, 51, 0.08);
+          border-left: 3px solid ${C.primary};
+          border-radius: 8px;
+          padding: 24px 28px;
+        }
+        .step-detail h4 {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: ${C.primary};
+          margin: 0 0 16px;
+        }
+        .step-detail ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .step-detail li {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.95rem;
+          line-height: 1.55;
+          color: ${C.ink};
+          padding: 8px 0 8px 24px;
+          position: relative;
+        }
+        .step-detail li::before {
+          content: "→";
+          position: absolute;
+          left: 0;
+          top: 8px;
+          color: ${C.action};
+          font-weight: 600;
+        }
+
+        .compliance {
+          background: ${C.primary};
+          padding: 64px 24px;
+          color: white;
+        }
+        .compliance-inner {
+          max-width: 720px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .compliance-inner h2 {
+          font-family: Georgia, serif;
+          font-size: 1.75rem;
+          color: white;
+          margin: 20px 0 16px;
+          letter-spacing: -0.01em;
+        }
+        .compliance-inner p {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1rem;
+          line-height: 1.7;
+          color: white;
+          opacity: 0.9;
+          margin: 0;
+        }
+
+        .cta {
+          padding: 80px 24px;
+          text-align: center;
+        }
+        .cta-inner {
+          max-width: 560px;
+          margin: 0 auto;
+        }
+        .cta-inner h2 {
+          font-family: Georgia, serif;
+          font-size: 2rem;
+          color: ${C.ink};
+          margin: 0 0 12px;
+        }
+        .cta-inner p {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1.05rem;
+          color: ${C.ink};
+          opacity: 0.75;
+          margin: 0 0 32px;
+        }
+        .btn-primary {
+          background: ${C.action};
+          color: white;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-family: "DM Sans", sans-serif;
+          font-weight: 600;
+          font-size: 1rem;
+          text-decoration: none;
+          transition: background 0.2s ease;
+          display: inline-block;
+        }
+        .btn-primary:hover {
+          background: ${C.primary};
+        }
+        .cta-btn {
+          font-size: 1.05rem;
+          padding: 16px 36px;
+        }
+      `}</style>
     </div>
   );
 }

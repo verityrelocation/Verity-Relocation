@@ -1,370 +1,434 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import Link from "next/link";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
 import { C, Shield } from "@/components/brand";
 
-function PageHero() {
-  const [vis, setVis] = useState(false);
-  useEffect(() => { setTimeout(() => setVis(true), 100); }, []);
+export default function Services() {
   return (
-    <section style={{ background: C.ink, padding: "5rem 2.5rem 4.5rem", opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(16px)", transition: "all 0.7s ease" }}>
-      <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
-        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 16 }}>SERVICES + PRICING</div>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 44, color: C.white, lineHeight: 1.2, margin: "0 0 1.25rem", fontWeight: 400 }}>One price. Every provider.<br/>Every direction.</h1>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 17, color: "#9FE1CB", lineHeight: 1.7, margin: 0, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>Whether you're moving to the Triangle, leaving North Carolina, or relocating across town — Verity handles every utility and internet provider for a single flat fee.</p>
-      </div>
-    </section>
-  );
-}
-
-function PricingHero() {
-  const [vis, setVis] = useState(false);
-  useEffect(() => { setTimeout(() => setVis(true), 300); }, []);
-  return (
-    <section style={{ background: C.parchment, padding: "4rem 2.5rem 1rem" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center", opacity: vis ? 1 : 0, transform: vis ? "scale(1)" : "scale(0.95)", transition: "all 0.5s ease" }}>
-        <div style={{ background: C.white, border: `2px solid ${C.primary}`, borderRadius: 16, padding: "40px 32px 36px", position: "relative" }}>
-          <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: C.primary, color: C.white, fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", padding: "5px 16px", borderRadius: 20 }}>FLAT FEE — ALL SERVICES</div>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 6, marginBottom: 8 }}>
-            <span style={{ fontFamily: "Georgia, serif", fontSize: 72, color: C.deep, lineHeight: 1 }}>$199</span>
-          </div>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: C.muted, marginBottom: 24 }}>per engagement, all providers included</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, textAlign: "left", marginBottom: 28 }}>
-            {[
-              "Duke Energy, Piedmont Gas, city water",
-              "Google Fiber, AT\u0026T Fiber, or Spectrum",
-              "WhatsApp status updates at every milestone",
-              "UETA-compliant Task Authorization",
-              "SSN + DL encrypted via Skyflow, 24-hour purge",
-              "No hidden fees, no per-provider charges",
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-                  <path d="M4 9.5L7.5 13L14 5" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                {item}
-              </div>
-            ))}
-          </div>
-          <button style={{ width: "100%", background: C.deep, color: C.white, border: "none", borderRadius: 6, padding: "14px", fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, cursor: "pointer" }}>Get started</button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PersonaCards() {
-  const [active, setActive] = useState(0);
-  const personas = [
-    {
-      tab: "Moving to NC",
-      title: "Out-of-state buyer",
-      subtitle: "Relocating to the Triangle from another state",
-      situation: "You've closed on a home in Wake, Durham, or Orange County. You don't know which utility providers serve your address, you can't navigate their portals with an out-of-state ID, and you need internet on Day 1 for remote work.",
-      weHandle: [
-        "Duke Energy new service activation",
-        "Piedmont Natural Gas new account",
-        "City water department activation (Durham, Raleigh, or Chapel Hill)",
-        "Google Fiber, AT&T Fiber, or Spectrum installation scheduling",
-      ],
-      youGet: [
-        "All utilities active before you arrive",
-        "Internet installation scheduled for your first week",
-        "Confirmation numbers for every account",
-        "Zero phone calls, zero portal navigation",
-      ],
-      time: "3–5 hours of phone calls eliminated",
-      pain: "Unfamiliar providers, out-of-state ID friction, remote logistics",
-    },
-    {
-      tab: "Leaving NC",
-      title: "Outbound seller",
-      subtitle: "Selling your Triangle home and moving out of state",
-      situation: "You've sold your home and you're moving out of North Carolina. Every provider needs a disconnection request, final meter reading, and deposit refund coordination — and you're juggling a move at the same time.",
-      weHandle: [
-        "Duke Energy disconnection and final billing",
-        "Piedmont Natural Gas service close",
-        "City water department final reading request",
-        "ISP disconnection and equipment return coordination",
-      ],
-      youGet: [
-        "All services disconnected on your schedule",
-        "Final bills routed to your forwarding address",
-        "Deposit refunds initiated where applicable",
-        "No surprise charges after you leave",
-      ],
-      time: "1–2 hours of phone calls eliminated",
-      pain: "Multiple disconnection processes while packing and moving",
-    },
-    {
-      tab: "Moving within NC",
-      title: "In-state mover",
-      subtitle: "Relocating within the Triangle market",
-      situation: "You're moving from one Triangle address to another. Every provider needs a service transfer or a disconnect-and-reconnect — that's double the calls, double the portals, double the scheduling headaches.",
-      weHandle: [
-        "Duke Energy transfer or disconnect/reconnect",
-        "Piedmont Gas transfer to new address",
-        "City water activation at new address + close at old",
-        "ISP transfer or new installation at new address",
-      ],
-      youGet: [
-        "Seamless transition with no service gaps",
-        "Old address disconnected on your move-out date",
-        "New address activated on your move-in date",
-        "Single point of coordination for all providers",
-      ],
-      time: "4–6 hours of phone calls eliminated",
-      pain: "Double the provider interactions — disconnect old, activate new",
-    },
-  ];
-
-  const p = personas[active];
-
-  return (
-    <section style={{ background: C.parchment, padding: "3rem 2.5rem 5rem" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>WHO WE SERVE</div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.deep, margin: 0, fontWeight: 400 }}>Same price. Tailored to your move.</h2>
-        </div>
-
-        <div style={{ display: "flex", gap: 0, marginBottom: 32, background: C.white, borderRadius: 10, border: `1px solid ${C.border}`, overflow: "hidden" }}>
-          {personas.map((per, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
-              style={{
-                flex: 1,
-                padding: "14px 16px",
-                background: active === i ? C.deep : "transparent",
-                color: active === i ? C.white : C.ink,
-                border: "none",
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "pointer",
-                borderRight: i < 2 ? `1px solid ${C.border}` : "none",
-                transition: "background 0.2s, color 0.2s",
-              }}
-            >
-              {per.tab}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ padding: "32px 36px", borderBottom: `1px solid ${C.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div>
-                <h3 style={{ fontFamily: "Georgia, serif", fontSize: 24, color: C.deep, margin: "0 0 4px", fontWeight: 400 }}>{p.title}</h3>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.muted }}>{p.subtitle}</div>
-              </div>
-              <div style={{ background: C.light, borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: C.deep }}>$199</div>
-                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid }}>flat fee</div>
-              </div>
-            </div>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, lineHeight: 1.7, margin: 0 }}>{p.situation}</p>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
-            <div style={{ padding: "28px 36px", borderRight: `1px solid ${C.border}` }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.1em", fontWeight: 500, marginBottom: 16 }}>WHAT WE HANDLE</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {p.weHandle.map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                      <path d="M3 8.5L6.5 12L13 4" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.5 }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ padding: "28px 36px" }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.amber, letterSpacing: "0.1em", fontWeight: 500, marginBottom: 16 }}>WHAT YOU GET</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {p.youGet.map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                      <path d="M3 8.5L6.5 12L13 4" stroke={C.amber} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.5 }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 36px", background: C.light, borderTop: `1px solid ${C.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.mid }}>
-                <span style={{ fontWeight: 500 }}>{p.time}</span>
-              </div>
-              <div style={{ width: 1, height: 16, background: C.border }} />
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.muted }}>{p.pain}</div>
-            </div>
-            <button style={{ background: C.deep, color: C.white, border: "none", borderRadius: 6, padding: "10px 24px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>Get started</button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Comparison() {
-  return (
-    <section style={{ background: C.white, padding: "5rem 2.5rem" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>WHY VERITY</div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.deep, margin: 0, fontWeight: 400 }}>What $199 replaces</h2>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-          <div style={{ border: `1px solid ${C.border}`, borderRadius: 14, overflow: "hidden" }}>
-            <div style={{ background: "#FDF6F0", padding: "20px 28px", borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: "0.1em", fontWeight: 500, color: "#B85042", marginBottom: 4 }}>WITHOUT VERITY</div>
-              <div style={{ fontFamily: "Georgia, serif", fontSize: 20, color: C.ink }}>The DIY experience</div>
-            </div>
-            <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                "45 min on hold with Duke Energy",
-                "Navigate Duke's portal with out-of-state ID",
-                "Call Piedmont Gas, wait for callback",
-                "Visit city water office or mail forms",
-                "Schedule Google Fiber — 2 week wait",
-                "Reschedule when ISP conflicts with move date",
-                "Track 4 separate confirmation numbers",
-                "3–6 hours total, spread across a week",
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                    <path d="M4 4L12 12M12 4L4 12" stroke="#B85042" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.5 }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ border: `2px solid ${C.primary}`, borderRadius: 14, overflow: "hidden" }}>
-            <div style={{ background: C.light, padding: "20px 28px", borderBottom: `1px solid ${C.border}` }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: "0.1em", fontWeight: 500, color: C.mid, marginBottom: 4 }}>WITH VERITY</div>
-              <div style={{ fontFamily: "Georgia, serif", fontSize: 20, color: C.deep }}>The handled experience</div>
-            </div>
-            <div style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
-                "Enter your address",
-                "Sign two checkboxes",
-                "Pay $199",
-                "Receive WhatsApp confirmation",
-                "Receive \"Duke Energy active\" update",
-                "Receive \"Google Fiber scheduled\" update",
-                "Receive \"All providers confirmed\" update",
-                "Move in. Lights on. Internet ready.",
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
-                    <path d="M3 8.5L6.5 12L13 4" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.5 }}>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function WhatsIncluded() {
-  const categories = [
-    {
-      label: "EXECUTION",
-      items: [
-        { title: "Provider portal submissions", desc: "We navigate Duke Energy, Piedmont Gas, and city water portals on your behalf" },
-        { title: "Phone-based activations", desc: "For providers requiring phone interaction, we handle IVR navigation and wait times" },
-        { title: "ISP installation scheduling", desc: "We coordinate Google Fiber, AT&T, or Spectrum install windows around your move date" },
-      ],
-    },
-    {
-      label: "COMMUNICATION",
-      items: [
-        { title: "WhatsApp status updates", desc: "Real-time notifications at each milestone — account confirmed, install scheduled, all done" },
-        { title: "SMS fallback", desc: "If WhatsApp isn't available, all updates sent via SMS" },
-        { title: "Confirmation documentation", desc: "Account numbers, confirmation codes, and install details delivered to you" },
-      ],
-    },
-    {
-      label: "SECURITY",
-      items: [
-        { title: "Encrypted PII vault", desc: "Your SSN and driver\u2019s license are tokenized via Skyflow \u2014 never stored in our application database. 24-hour TTL purge after completion." },
-        { title: "No credential storage", desc: "We never ask for or store your existing login credentials for any provider. SSN and DL are used only for provider verification." },
-        { title: "UETA-compliant authorization", desc: "Legally valid electronic signature with 24-hour revocation clause" },
-      ],
-    },
-  ];
-
-  return (
-    <section style={{ background: C.parchment, padding: "5rem 2.5rem" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.primary, letterSpacing: "0.15em", fontWeight: 500, marginBottom: 12 }}>WHAT'S INCLUDED</div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.deep, margin: 0, fontWeight: 400 }}>Everything in the $199 flat fee</h2>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
-          {categories.map((cat, ci) => (
-            <div key={ci}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.12em", fontWeight: 500, marginBottom: 16 }}>{cat.label}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                {cat.items.map((item, i) => (
-                  <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "20px" }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: C.light, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 14 }}>
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8.5L6.5 12L13 4" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink, marginBottom: 6 }}>{item.title}</div>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{item.desc}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTASection() {
-  return (
-    <section style={{ background: C.deep, padding: "4.5rem 2.5rem", textAlign: "center" }}>
-      <div style={{ maxWidth: 600, margin: "0 auto" }}>
-        <Shield size={48} color="#5DCAA5" check="#E8F5EF" />
-        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 32, color: C.white, margin: "1.5rem 0 1rem", fontWeight: 400 }}>Your move is complicated enough.</h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, color: "#9FE1CB", lineHeight: 1.7, margin: "0 0 2rem" }}>$199. All providers. All directions. We handle the utilities so you can handle the move.</p>
-        <button style={{ background: C.white, color: C.deep, border: "none", borderRadius: 6, padding: "14px 40px", fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, cursor: "pointer" }}>Get started</button>
-      </div>
-    </section>
-  );
-}
-
-export default function ServicesPage() {
-  return (
-    <div style={{ background: C.parchment, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
+    <div style={{ background: C.parchment, color: C.ink, minHeight: "100vh" }}>
       <Nav />
-      <PageHero />
-      <PricingHero />
-      <PersonaCards />
-      <Comparison />
-      <WhatsIncluded />
-      <CTASection />
+
+      {/* Header */}
+      <section className="page-head">
+        <div className="page-head-inner">
+          <div className="eyebrow">Services &amp; Pricing</div>
+          <h1>Two flat fees. Every detail handled.</h1>
+          <p className="lede">
+            Verity covers two clear packages for residential moves across the Triangle and
+            RTP. No subscriptions. No hourly billing. No surprise add-ons after the work
+            begins.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing tiers */}
+      <section className="tiers">
+        <div className="tiers-inner">
+          <div className="tier-grid">
+            <article className="tier">
+              <header className="tier-head">
+                <div className="tier-name">Essentials</div>
+                <div className="tier-price">
+                  <span className="tier-price-amt">$99</span>
+                  <span className="tier-price-unit">flat</span>
+                </div>
+                <p className="tier-tag">
+                  Home services scheduled and confirmed before you arrive.
+                </p>
+              </header>
+              <h4 className="tier-section">What&rsquo;s included</h4>
+              <ul className="tier-list">
+                <li>
+                  <strong>Internet service provider scheduling.</strong> We coordinate
+                  installation appointments with your chosen internet service provider
+                  and confirm the install
+                  window in writing.
+                </li>
+                <li>
+                  <strong>Home alarm &amp; monitoring setup.</strong> We schedule
+                  installation or transfer of monitored security service for your new home.
+                </li>
+                <li>
+                  <strong>Pest control service setup.</strong> We coordinate the initial
+                  inspection and recurring service start with a local provider.
+                </li>
+                <li>
+                  <strong>Bulk trash pickup scheduling.</strong> We arrange municipal or
+                  private bulk pickup for the items you can&rsquo;t take with you.
+                </li>
+              </ul>
+              <Link href="/get-started?tier=essentials" className="btn-primary tier-cta">
+                Choose Essentials
+              </Link>
+            </article>
+
+            <article className="tier tier-featured">
+              <div className="tier-flag">Most chosen</div>
+              <header className="tier-head">
+                <div className="tier-name">Full Move</div>
+                <div className="tier-price">
+                  <span className="tier-price-amt">$199</span>
+                  <span className="tier-price-unit">flat</span>
+                </div>
+                <p className="tier-tag">
+                  Everything in Essentials, plus utilities &mdash; in either direction.
+                </p>
+              </header>
+              <h4 className="tier-section">What&rsquo;s included</h4>
+              <ul className="tier-list">
+                <li>
+                  <strong>Everything in Essentials.</strong> Internet, alarm, pest, bulk trash.
+                </li>
+                <li>
+                  <strong>Electric service.</strong> Activation at your new home and
+                  disconnection at your old home.
+                </li>
+                <li>
+                  <strong>Natural gas service.</strong> Activation and disconnection
+                  scheduled to match your move dates.
+                </li>
+                <li>
+                  <strong>Municipal water service.</strong> City and county water account
+                  setup and closure.
+                </li>
+                <li>
+                  <strong>Both directions, one fee.</strong> Whether you&rsquo;re moving
+                  into North Carolina, out of North Carolina, or within North Carolina, the
+                  $199 covers everything you need on either side of the move.
+                </li>
+              </ul>
+              <Link href="/get-started?tier=full" className="btn-primary tier-cta">
+                Choose Full Move
+              </Link>
+            </article>
+          </div>
+
+          <p className="tier-footnote">
+            A third tier is in development. Existing Verity customers will be notified
+            first when it launches.
+          </p>
+        </div>
+      </section>
+
+      {/* What we don't do */}
+      <section className="scope">
+        <div className="scope-inner">
+          <div className="scope-grid">
+            <div>
+              <h2>What Verity does</h2>
+              <ul className="scope-list scope-list-yes">
+                <li>Coordinate with utility, internet, and home service providers on your behalf</li>
+                <li>Document every account number, service date, and confirmation in writing</li>
+                <li>
+                  Operate under a North Carolina Limited Power of Attorney that authorizes
+                  only the tasks you select &mdash; nothing more
+                </li>
+                <li>Verify identity through encrypted, short-retention systems</li>
+              </ul>
+            </div>
+            <div>
+              <h2>What Verity doesn&rsquo;t do</h2>
+              <ul className="scope-list scope-list-no">
+                <li>Move, pack, or transport household goods</li>
+                <li>Broker or arrange interstate moving services</li>
+                <li>Provide legal, tax, real estate, or insurance advice</li>
+                <li>Pay deposits, fees, or charges to providers on your behalf</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="cta">
+        <div className="cta-inner">
+          <Shield size={56} />
+          <h2>Ready to start?</h2>
+          <p>The intake takes about five minutes. We handle it from there.</p>
+          <Link href="/get-started" className="btn-primary cta-btn">
+            Start your move
+          </Link>
+        </div>
+      </section>
+
       <Footer />
+
+      <style jsx>{`
+        .page-head {
+          padding: 80px 24px 48px;
+          text-align: center;
+        }
+        .page-head-inner {
+          max-width: 760px;
+          margin: 0 auto;
+        }
+        .eyebrow {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: ${C.amber};
+          margin-bottom: 16px;
+        }
+        h1 {
+          font-family: Georgia, serif;
+          font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: ${C.ink};
+          margin: 0 0 20px;
+        }
+        .lede {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1.1rem;
+          line-height: 1.6;
+          color: ${C.ink};
+          opacity: 0.8;
+          margin: 0;
+        }
+
+        .tiers {
+          padding: 48px 24px 96px;
+        }
+        .tiers-inner {
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+        .tier-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 32px;
+          max-width: 920px;
+          margin: 0 auto;
+        }
+        @media (max-width: 720px) {
+          .tier-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .tier {
+          background: white;
+          border: 1.5px solid rgba(28, 43, 51, 0.1);
+          border-radius: 12px;
+          padding: 40px 36px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+        }
+        .tier-featured {
+          border-color: ${C.primary};
+          border-width: 2px;
+          box-shadow: 0 8px 32px rgba(10, 77, 62, 0.12);
+        }
+        .tier-flag {
+          position: absolute;
+          top: -12px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: ${C.primary};
+          color: white;
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 6px 14px;
+          border-radius: 999px;
+        }
+        .tier-head {
+          margin-bottom: 24px;
+        }
+        .tier-name {
+          font-family: Georgia, serif;
+          font-size: 1.5rem;
+          color: ${C.primary};
+          margin-bottom: 12px;
+        }
+        .tier-price {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+        .tier-price-amt {
+          font-family: Georgia, serif;
+          font-size: 3rem;
+          font-weight: 700;
+          color: ${C.ink};
+          letter-spacing: -0.02em;
+        }
+        .tier-price-unit {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1rem;
+          color: ${C.ink};
+          opacity: 0.6;
+        }
+        .tier-tag {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.95rem;
+          color: ${C.ink};
+          opacity: 0.75;
+          line-height: 1.5;
+          margin: 0;
+        }
+        .tier-section {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.75rem;
+          font-weight: 600;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: ${C.ink};
+          opacity: 0.6;
+          margin: 0 0 16px;
+        }
+        .tier-list {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 32px;
+          flex: 1;
+        }
+        .tier-list li {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.95rem;
+          line-height: 1.55;
+          color: ${C.ink};
+          padding: 12px 0 12px 28px;
+          position: relative;
+          border-bottom: 1px solid rgba(28, 43, 51, 0.06);
+        }
+        .tier-list li:last-child {
+          border-bottom: none;
+        }
+        .tier-list li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 16px;
+          width: 16px;
+          height: 16px;
+          background: ${C.action};
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/></svg>") center/contain no-repeat;
+          -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z'/></svg>") center/contain no-repeat;
+        }
+        .btn-primary {
+          background: ${C.action};
+          color: white;
+          padding: 14px 28px;
+          border-radius: 8px;
+          font-family: "DM Sans", sans-serif;
+          font-weight: 600;
+          font-size: 1rem;
+          text-decoration: none;
+          transition: background 0.2s ease;
+          display: inline-block;
+        }
+        .btn-primary:hover {
+          background: ${C.primary};
+        }
+        .tier-cta {
+          width: 100%;
+          text-align: center;
+        }
+        .tier-footnote {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.875rem;
+          color: ${C.ink};
+          opacity: 0.6;
+          text-align: center;
+          margin: 40px auto 0;
+          max-width: 560px;
+          font-style: italic;
+        }
+
+        .scope {
+          background: white;
+          padding: 80px 24px;
+          border-top: 1px solid rgba(28, 43, 51, 0.08);
+          border-bottom: 1px solid rgba(28, 43, 51, 0.08);
+        }
+        .scope-inner {
+          max-width: 1080px;
+          margin: 0 auto;
+        }
+        .scope-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 64px;
+        }
+        @media (max-width: 720px) {
+          .scope-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+          }
+        }
+        .scope-grid h2 {
+          font-family: Georgia, serif;
+          font-size: 1.6rem;
+          color: ${C.ink};
+          margin: 0 0 24px;
+          letter-spacing: -0.01em;
+        }
+        .scope-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .scope-list li {
+          font-family: "DM Sans", sans-serif;
+          font-size: 0.95rem;
+          line-height: 1.6;
+          color: ${C.ink};
+          padding: 12px 0 12px 32px;
+          position: relative;
+          border-bottom: 1px solid rgba(28, 43, 51, 0.06);
+        }
+        .scope-list li::before {
+          position: absolute;
+          left: 0;
+          top: 12px;
+          font-family: Georgia, serif;
+          font-weight: 700;
+          font-size: 1.1rem;
+        }
+        .scope-list-yes li::before {
+          content: "✓";
+          color: ${C.action};
+        }
+        .scope-list-no li::before {
+          content: "—";
+          color: ${C.ink};
+          opacity: 0.4;
+        }
+
+        .cta {
+          padding: 96px 24px;
+          text-align: center;
+        }
+        .cta-inner {
+          max-width: 560px;
+          margin: 0 auto;
+        }
+        .cta-inner h2 {
+          font-family: Georgia, serif;
+          font-size: 2rem;
+          color: ${C.ink};
+          margin: 24px 0 12px;
+        }
+        .cta-inner p {
+          font-family: "DM Sans", sans-serif;
+          font-size: 1.05rem;
+          color: ${C.ink};
+          opacity: 0.75;
+          margin: 0 0 32px;
+        }
+        .cta-btn {
+          font-size: 1.05rem;
+          padding: 16px 36px;
+        }
+      `}</style>
     </div>
   );
 }
