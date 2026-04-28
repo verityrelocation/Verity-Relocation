@@ -21,7 +21,7 @@ function Hero() {
           </div>
         </div>
         <div className="hero-right">
-          {[{ provider: "Duke Energy", status: "Active", detail: "Account #4821-7739" }, { provider: "Google Fiber", status: "Scheduled", detail: "Install: June 3, 9am\u20131pm" }, { provider: "City of Durham Water", status: "Active", detail: "Account #DWS-0094512" }].map((item, i) => (
+          {[{ provider: "Electric service", status: "Active", detail: "Account #4821-7739" }, { provider: "Internet", status: "Scheduled", detail: "Install: June 3, 9am\u20131pm" }, { provider: "Water service", status: "Active", detail: "Account #DWS-0094512" }].map((item, i) => (
             <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", opacity: visible ? 1 : 0, transform: visible ? "translateX(0)" : "translateX(30px)", transition: `opacity 0.6s ease ${0.3 + i * 0.15}s, transform 0.6s ease ${0.3 + i * 0.15}s` }}>
               <div>
                 <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: C.ink }}>{item.provider}</div>
@@ -87,8 +87,8 @@ function ServicesPreview() {
               tag: "Everything in Essentials, plus utilities \u2014 either direction.",
               services: [
                 "Everything in Essentials",
-                "Electric service (Duke Energy)",
-                "Natural gas (Piedmont)",
+                "Electric service activation & disconnection",
+                "Natural gas service activation & disconnection",
                 "Municipal water service",
                 "In-state movers: both directions, one fee"
               ],
@@ -140,7 +140,7 @@ function TrustBar() {
 function HomeFAQ() {
   const [open, setOpen] = useState(null);
   const faqs = [
-    { q: "What exactly does Verity do?", a: "We coordinate utility activation and disconnection (Duke Energy, Piedmont Gas, city water), internet service provider scheduling, home alarm setup, pest control setup, and bulk trash pickup on your behalf. You sign a simple Task Authorization and we handle every call, portal submission, and scheduling confirmation." },
+    { q: "What exactly does Verity do?", a: "We coordinate utility activation and disconnection (electric, natural gas, municipal water), internet service provider scheduling, home alarm setup, pest control setup, and bulk trash pickup on your behalf. You sign a simple Task Authorization and we handle every call, portal submission, and scheduling confirmation." },
     { q: "Is my personal information safe?", a: "Yes. Your SSN and driver\u2019s license number are stored in an encrypted PII vault (Skyflow) and automatically purged 24 hours after your engagement is complete. This data is tokenized \u2014 it never enters our standard database. Payments are processed through Stripe\u2019s hosted checkout." },
     { q: "How is this different from a checklist app?", a: "Checklist apps tell you what to do. We do it. You don\u2019t make a single phone call, navigate a single portal, or wait on hold. We execute the provider interactions end-to-end." },
     { q: "Do I need to share my login credentials?", a: "No. We create new accounts or manage service requests directly with providers using your Task Authorization. We never ask for or store your existing login credentials." },
