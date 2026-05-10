@@ -1,794 +1,586 @@
 "use client";
-
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect, useMemo } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
 import { C, Shield } from "@/components/brand";
 
-function GetStartedInner() {
-  const searchParams = useSearchParams();
-  const [step, setStep] = useState(1);
-  const [tier, setTier] = useState("");
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    moveOutDate: "",
-    moveInDate: "",
-    oldAddress: "",
-    newAddress: "",
-    ssn: "",
-    dlNumber: "",
-    dlState: "NC",
-    consent: false,
-    lpoaConsent: false,
-  });
+// Stripe.js loaded once at module scope (recommended pattern).
+// Falls back to a no-op promise if the env var is missing so the page still renders in dev.
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
-  // Pre-select tier from URL parameter
-  useEffect(() => {
-    const t = searchParams.get("tier");
-    if (t === "essentials" || t === "full") {
-      setTier(t);
-    }
-  }, [searchParams]);
+// Tier definitions — keep in sync with PRICES in /api/create-payment-intent/route.js
+const TIERS = [
+  {
+    id: "essentials",
+    name: "Essentials",
+    price: 99,
+    tagline: "ISP, alarm, pest, bulk trash",
+    includes: [
+      "ISP scheduling (Google Fiber, AT&T, Spectrum)",
+      "Alarm service setup",
+      "Pest control setup",
+      "Bulk trash pickup scheduling",
+    ],
+  },
+  {
+    id: "full_move",
+    name: "Full Move",
+    price: 199,
+    tagline: "Everything in Essentials plus utilities",
+    includes: [
+      "Everything in Essentials",
+      "Duke Energy activation / disconnection",
+      "Piedmont Gas service",
+      "City water (Durham, Raleigh, Cary)",
+    ],
+    recommended: true,
+  },
+];
 
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const next = () => setStep((s) => Math.min(s + 1, 4));
-  const back = () => setStep((s) => Math.max(s - 1, 1));
-
-  const tierLabel = tier === "essentials" ? "Essentials" : tier === "full" ? "Full Move" : "";
-  const tierPrice = tier === "essentials" ? "$99" : tier === "full" ? "$199" : "";
-
+function Check({ checked }) {
   return (
-    <div style={{ background: C.parchment, color: C.ink, minHeight: "100vh" }}>
-      <Nav />
-
-      <section className="page-head">
-        <div className="page-head-inner">
-          <div className="eyebrow">Get Started</div>
-          <h1>Let&rsquo;s set up your move.</h1>
-          <p className="lede">
-            Four steps. About five minutes. We&rsquo;ll handle the rest from there.
-          </p>
-        </div>
-      </section>
-
-      {/* Progress */}
-      <section className="progress">
-        <div className="progress-inner">
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className={`step-dot ${step >= n ? "active" : ""}`}>
-              <div className="step-dot-num">{n}</div>
-              <div className="step-dot-label">
-                {n === 1 ? "Package" : n === 2 ? "Move details" : n === 3 ? "Verification" : "Authorize"}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Form */}
-      <section className="form">
-        <div className="form-inner">
-          {/* STEP 1: Choose tier */}
-          {step === 1 && (
-            <div className="step-panel">
-              <h2>Choose your package</h2>
-              <p className="step-help">Pick the tier that matches your move.</p>
-
-              <div className="tier-choice-grid">
-                <button
-                  type="button"
-                  className={`tier-choice ${tier === "essentials" ? "selected" : ""}`}
-                  onClick={() => setTier("essentials")}
-                >
-                  <div className="tc-name">Essentials</div>
-                  <div className="tc-price">$99</div>
-                  <ul>
-                    <li>Internet service provider scheduling</li>
-                    <li>Alarm setup</li>
-                    <li>Pest control setup</li>
-                    <li>Bulk trash pickup</li>
-                  </ul>
-                </button>
-
-                <button
-                  type="button"
-                  className={`tier-choice ${tier === "full" ? "selected" : ""}`}
-                  onClick={() => setTier("full")}
-                >
-                  <div className="tc-flag">Most chosen</div>
-                  <div className="tc-name">Full Move</div>
-                  <div className="tc-price">$199</div>
-                  <ul>
-                    <li>Everything in Essentials</li>
-                    <li>Electric activation &amp; disconnect</li>
-                    <li>Gas activation &amp; disconnect</li>
-                    <li>Water service activation &amp; disconnect</li>
-                    <li>
-                      <strong>In-state movers:</strong> both directions, one fee
-                    </li>
-                  </ul>
-                </button>
-              </div>
-
-              <div className="step-actions">
-                <button
-                  type="button"
-                  className="btn-primary"
-                  disabled={!tier}
-                  onClick={next}
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: Move details */}
-          {step === 2 && (
-            <div className="step-panel">
-              <div className="tier-banner">
-                <span className="tier-banner-label">Selected:</span>{" "}
-                <strong>{tierLabel}</strong> &mdash; {tierPrice} flat
-              </div>
-              <h2>Tell us about your move</h2>
-              <p className="step-help">All fields are required.</p>
-
-              <div className="field-row">
-                <label className="field">
-                  <span>First name</span>
-                  <input
-                    type="text"
-                    value={form.firstName}
-                    onChange={(e) => update("firstName", e.target.value)}
-                  />
-                </label>
-                <label className="field">
-                  <span>Last name</span>
-                  <input
-                    type="text"
-                    value={form.lastName}
-                    onChange={(e) => update("lastName", e.target.value)}
-                  />
-                </label>
-              </div>
-
-              <div className="field-row">
-                <label className="field">
-                  <span>Email</span>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
-                  />
-                </label>
-                <label className="field">
-                  <span>Phone</span>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={(e) => update("phone", e.target.value)}
-                  />
-                </label>
-              </div>
-
-              <div className="field-row">
-                <label className="field">
-                  <span>Move-out date</span>
-                  <input
-                    type="date"
-                    value={form.moveOutDate}
-                    onChange={(e) => update("moveOutDate", e.target.value)}
-                  />
-                </label>
-                <label className="field">
-                  <span>Move-in date</span>
-                  <input
-                    type="date"
-                    value={form.moveInDate}
-                    onChange={(e) => update("moveInDate", e.target.value)}
-                  />
-                </label>
-              </div>
-
-              <label className="field">
-                <span>Current address</span>
-                <input
-                  type="text"
-                  value={form.oldAddress}
-                  onChange={(e) => update("oldAddress", e.target.value)}
-                />
-              </label>
-
-              <label className="field">
-                <span>New address</span>
-                <input
-                  type="text"
-                  value={form.newAddress}
-                  onChange={(e) => update("newAddress", e.target.value)}
-                />
-              </label>
-
-              <div className="step-actions">
-                <button type="button" className="btn-ghost" onClick={back}>
-                  Back
-                </button>
-                <button type="button" className="btn-primary" onClick={next}>
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Verification */}
-          {step === 3 && (
-            <div className="step-panel">
-              <div className="tier-banner">
-                <span className="tier-banner-label">Selected:</span>{" "}
-                <strong>{tierLabel}</strong> &mdash; {tierPrice} flat
-              </div>
-              <h2>Identity verification</h2>
-              <p className="step-help">
-                Utility providers require government-issued identification before they
-                will activate or close an account in your name. Your information is
-                encrypted on submission and purged within 24 hours after task completion.
-              </p>
-
-              <div className="security-note">
-                <Shield size={32} />
-                <div>
-                  <strong>Encrypted, isolated storage.</strong>
-                  <p>
-                    Sensitive identifiers are stored in a dedicated PII vault separate
-                    from our application systems. They are never sold, never shared with
-                    marketing platforms, and are purged from the vault within 24 hours of
-                    your task completion.
-                  </p>
-                </div>
-              </div>
-
-              <label className="field">
-                <span>Social Security Number</span>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="XXX-XX-XXXX"
-                  value={form.ssn}
-                  onChange={(e) => update("ssn", e.target.value)}
-                />
-              </label>
-
-              <div className="field-row">
-                <label className="field">
-                  <span>Driver&rsquo;s License Number</span>
-                  <input
-                    type="text"
-                    value={form.dlNumber}
-                    onChange={(e) => update("dlNumber", e.target.value)}
-                  />
-                </label>
-                <label className="field">
-                  <span>Issuing State</span>
-                  <select
-                    value={form.dlState}
-                    onChange={(e) => update("dlState", e.target.value)}
-                  >
-                    <option value="NC">North Carolina</option>
-                    <option value="SC">South Carolina</option>
-                    <option value="VA">Virginia</option>
-                    <option value="GA">Georgia</option>
-                    <option value="TN">Tennessee</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="step-actions">
-                <button type="button" className="btn-ghost" onClick={back}>
-                  Back
-                </button>
-                <button type="button" className="btn-primary" onClick={next}>
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: Authorization */}
-          {step === 4 && (
-            <div className="step-panel">
-              <div className="tier-banner">
-                <span className="tier-banner-label">Selected:</span>{" "}
-                <strong>{tierLabel}</strong> &mdash; {tierPrice} flat
-              </div>
-              <h2>Authorize the work</h2>
-              <p className="step-help">
-                Review and sign the Limited Power of Attorney that lets a Verity
-                concierge complete the tasks you&rsquo;ve selected.
-              </p>
-
-              <div className="lpoa-summary">
-                <h3>Summary of what you&rsquo;re authorizing</h3>
-                <ul>
-                  <li>
-                    A Verity concierge may contact the providers tied to your selected
-                    package and open or close accounts in your name.
-                  </li>
-                  <li>
-                    The authorization covers only the tasks you&rsquo;ve selected at the
-                    addresses you&rsquo;ve provided.
-                  </li>
-                  <li>
-                    The authorization does <em>not</em> permit Verity to pay deposits,
-                    transfer funds, or incur charges on your behalf.
-                  </li>
-                  <li>
-                    The authorization is revocable at any time with 24 hours&rsquo; notice
-                    for tasks already in progress.
-                  </li>
-                  <li>
-                    The authorization expires automatically when the move-related tasks
-                    you selected are complete.
-                  </li>
-                </ul>
-                <p className="lpoa-cite">
-                  Authorized under N.C.G.S. Chapter 32C (Uniform Power of Attorney Act)
-                  and N.C.G.S. Chapter 66, Article 40 (Uniform Electronic Transactions
-                  Act).
-                </p>
-                <p>
-                  <Link href="/terms-of-service" target="_blank">
-                    Read the full Terms of Service
-                  </Link>
-                  {" "}and{" "}
-                  <Link href="/privacy-policy" target="_blank">
-                    Privacy Policy
-                  </Link>
-                  .
-                </p>
-              </div>
-
-              <label className="checkbox">
-                <input
-                  type="checkbox"
-                  checked={form.lpoaConsent}
-                  onChange={(e) => update("lpoaConsent", e.target.checked)}
-                />
-                <span>
-                  I authorize Verity Agentic Services LLC, dba Verity Relocation, to act
-                  as my agent under a North Carolina Limited Power of Attorney for the
-                  scope and duration described above.
-                </span>
-              </label>
-
-              <label className="checkbox">
-                <input
-                  type="checkbox"
-                  checked={form.consent}
-                  onChange={(e) => update("consent", e.target.checked)}
-                />
-                <span>
-                  I have read and agree to the{" "}
-                  <Link href="/terms-of-service" target="_blank">Terms of Service</Link> and{" "}
-                  <Link href="/privacy-policy" target="_blank">Privacy Policy</Link>, including
-                  the binding arbitration and class action waiver provisions.
-                </span>
-              </label>
-
-              <div className="step-actions">
-                <button type="button" className="btn-ghost" onClick={back}>
-                  Back
-                </button>
-                <button
-                  type="button"
-                  className="btn-primary"
-                  disabled={!form.consent || !form.lpoaConsent}
-                  onClick={() => {
-                    /* Stripe checkout handoff goes here */
-                    alert("Proceeding to secure payment via Stripe.");
-                  }}
-                >
-                  Continue to payment ({tierPrice})
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <Footer />
-
-      <style jsx>{`
-        .page-head {
-          padding: 64px 24px 32px;
-          text-align: center;
-        }
-        .page-head-inner {
-          max-width: 720px;
-          margin: 0 auto;
-        }
-        .eyebrow {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: ${C.amber};
-          margin-bottom: 16px;
-        }
-        h1 {
-          font-family: Georgia, serif;
-          font-size: clamp(2rem, 4vw, 3rem);
-          line-height: 1.15;
-          letter-spacing: -0.02em;
-          color: ${C.ink};
-          margin: 0 0 16px;
-        }
-        .lede {
-          font-family: "DM Sans", sans-serif;
-          font-size: 1.05rem;
-          line-height: 1.6;
-          color: ${C.ink};
-          opacity: 0.8;
-          margin: 0;
-        }
-
-        .progress {
-          padding: 24px;
-        }
-        .progress-inner {
-          max-width: 720px;
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 8px;
-        }
-        .step-dot {
-          text-align: center;
-          padding-top: 12px;
-          border-top: 3px solid rgba(28, 43, 51, 0.15);
-          opacity: 0.5;
-          transition: all 0.3s ease;
-        }
-        .step-dot.active {
-          border-top-color: ${C.action};
-          opacity: 1;
-        }
-        .step-dot-num {
-          font-family: Georgia, serif;
-          font-size: 0.875rem;
-          font-weight: 700;
-          color: ${C.primary};
-        }
-        .step-dot-label {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.75rem;
-          color: ${C.ink};
-          margin-top: 4px;
-        }
-
-        .form {
-          padding: 32px 24px 96px;
-        }
-        .form-inner {
-          max-width: 720px;
-          margin: 0 auto;
-        }
-        .step-panel {
-          background: white;
-          border: 1px solid rgba(28, 43, 51, 0.08);
-          border-radius: 12px;
-          padding: 48px 40px;
-        }
-        @media (max-width: 720px) {
-          .step-panel {
-            padding: 32px 24px;
-          }
-        }
-        .step-panel h2 {
-          font-family: Georgia, serif;
-          font-size: 1.75rem;
-          color: ${C.ink};
-          margin: 0 0 12px;
-          letter-spacing: -0.01em;
-        }
-        .step-help {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.95rem;
-          line-height: 1.6;
-          color: ${C.ink};
-          opacity: 0.75;
-          margin: 0 0 32px;
-        }
-        .tier-banner {
-          background: ${C.parchment};
-          border-left: 3px solid ${C.amber};
-          padding: 12px 16px;
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.9rem;
-          color: ${C.ink};
-          margin-bottom: 24px;
-          border-radius: 4px;
-        }
-        .tier-banner-label {
-          opacity: 0.7;
-        }
-
-        .tier-choice-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-          margin-bottom: 32px;
-        }
-        @media (max-width: 600px) {
-          .tier-choice-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-        .tier-choice {
-          background: white;
-          border: 2px solid rgba(28, 43, 51, 0.12);
-          border-radius: 12px;
-          padding: 24px 20px;
-          cursor: pointer;
-          text-align: left;
-          font-family: inherit;
-          position: relative;
-          transition: all 0.2s ease;
-        }
-        .tier-choice:hover {
-          border-color: ${C.action};
-        }
-        .tier-choice.selected {
-          border-color: ${C.action};
-          background: rgba(29, 158, 117, 0.05);
-        }
-        .tc-flag {
-          position: absolute;
-          top: -10px;
-          left: 16px;
-          background: ${C.primary};
-          color: white;
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.7rem;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          padding: 4px 10px;
-          border-radius: 999px;
-        }
-        .tc-name {
-          font-family: Georgia, serif;
-          font-size: 1.25rem;
-          color: ${C.primary};
-          margin-bottom: 8px;
-        }
-        .tc-price {
-          font-family: Georgia, serif;
-          font-size: 2rem;
-          font-weight: 700;
-          color: ${C.ink};
-          margin-bottom: 16px;
-          letter-spacing: -0.02em;
-        }
-        .tier-choice ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-        }
-        .tier-choice li {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.9rem;
-          line-height: 1.5;
-          color: ${C.ink};
-          padding: 6px 0 6px 20px;
-          position: relative;
-        }
-        .tier-choice li::before {
-          content: "✓";
-          position: absolute;
-          left: 0;
-          top: 6px;
-          color: ${C.action};
-          font-weight: 700;
-        }
-
-        .field-row {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-        }
-        @media (max-width: 600px) {
-          .field-row {
-            grid-template-columns: 1fr;
-          }
-        }
-        .field {
-          display: flex;
-          flex-direction: column;
-          margin-bottom: 20px;
-        }
-        .field span {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: ${C.ink};
-          margin-bottom: 6px;
-        }
-        .field input,
-        .field select {
-          font-family: "DM Sans", sans-serif;
-          font-size: 1rem;
-          padding: 12px 14px;
-          border: 1.5px solid rgba(28, 43, 51, 0.15);
-          border-radius: 8px;
-          background: white;
-          color: ${C.ink};
-          transition: border 0.2s ease;
-        }
-        .field input:focus,
-        .field select:focus {
-          outline: none;
-          border-color: ${C.action};
-        }
-
-        .security-note {
-          background: ${C.parchment};
-          border: 1px solid rgba(10, 77, 62, 0.15);
-          border-left: 3px solid ${C.primary};
-          padding: 20px;
-          border-radius: 8px;
-          margin-bottom: 28px;
-          display: grid;
-          grid-template-columns: 40px 1fr;
-          gap: 16px;
-          align-items: start;
-        }
-        .security-note strong {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.95rem;
-          color: ${C.primary};
-          display: block;
-          margin-bottom: 6px;
-        }
-        .security-note p {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.875rem;
-          line-height: 1.55;
-          color: ${C.ink};
-          opacity: 0.85;
-          margin: 0;
-        }
-
-        .lpoa-summary {
-          background: ${C.parchment};
-          border: 1px solid rgba(28, 43, 51, 0.1);
-          border-radius: 8px;
-          padding: 24px 28px;
-          margin-bottom: 28px;
-        }
-        .lpoa-summary h3 {
-          font-family: Georgia, serif;
-          font-size: 1.15rem;
-          color: ${C.primary};
-          margin: 0 0 16px;
-        }
-        .lpoa-summary ul {
-          list-style: none;
-          padding: 0;
-          margin: 0 0 16px;
-        }
-        .lpoa-summary li {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.92rem;
-          line-height: 1.55;
-          color: ${C.ink};
-          padding: 8px 0 8px 20px;
-          position: relative;
-        }
-        .lpoa-summary li::before {
-          content: "•";
-          position: absolute;
-          left: 0;
-          top: 8px;
-          color: ${C.action};
-          font-weight: 700;
-        }
-        .lpoa-cite {
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.825rem;
-          font-style: italic;
-          color: ${C.ink};
-          opacity: 0.7;
-          margin: 0 0 12px;
-        }
-        .lpoa-summary a {
-          color: ${C.primary};
-          font-weight: 600;
-        }
-
-        .checkbox {
-          display: grid;
-          grid-template-columns: 24px 1fr;
-          gap: 12px;
-          align-items: start;
-          font-family: "DM Sans", sans-serif;
-          font-size: 0.9rem;
-          line-height: 1.5;
-          color: ${C.ink};
-          padding: 14px 16px;
-          background: white;
-          border: 1px solid rgba(28, 43, 51, 0.1);
-          border-radius: 8px;
-          cursor: pointer;
-          margin-bottom: 12px;
-        }
-        .checkbox input {
-          margin-top: 2px;
-        }
-        .checkbox a {
-          color: ${C.primary};
-          font-weight: 600;
-        }
-
-        .step-actions {
-          display: flex;
-          justify-content: space-between;
-          gap: 16px;
-          margin-top: 32px;
-        }
-        .step-actions .btn-primary {
-          margin-left: auto;
-        }
-        .btn-primary {
-          background: ${C.action};
-          color: white;
-          padding: 14px 28px;
-          border: none;
-          border-radius: 8px;
-          font-family: "DM Sans", sans-serif;
-          font-weight: 600;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: background 0.2s ease;
-        }
-        .btn-primary:hover:not(:disabled) {
-          background: ${C.primary};
-        }
-        .btn-primary:disabled {
-          background: rgba(28, 43, 51, 0.2);
-          cursor: not-allowed;
-        }
-        .btn-ghost {
-          background: transparent;
-          color: ${C.primary};
-          padding: 14px 28px;
-          border: 1.5px solid ${C.primary};
-          border-radius: 8px;
-          font-family: "DM Sans", sans-serif;
-          font-weight: 600;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .btn-ghost:hover {
-          background: ${C.primary};
-          color: white;
-        }
-      `}</style>
+    <div style={{ width: 22, height: 22, borderRadius: 5, background: checked ? C.primary : C.white, border: `1.5px solid ${checked ? C.primary : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer", transition: "all 0.15s ease" }}>
+      {checked && <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2.5 7L5.5 10L10.5 3.5" stroke={C.white} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
     </div>
   );
 }
 
-export default function GetStarted() {
+function Radio({ selected }) {
   return (
-    <Suspense fallback={<div style={{ padding: 64, textAlign: "center" }}>Loading...</div>}>
-      <GetStartedInner />
-    </Suspense>
+    <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${selected ? C.primary : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer", transition: "all 0.15s ease" }}>
+      {selected && <div style={{ width: 10, height: 10, borderRadius: "50%", background: C.primary }} />}
+    </div>
+  );
+}
+
+function StepIndicator({ current }) {
+  const steps = ["Service agreement", "Payment", "E-sign authorization"];
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, padding: "24px 0 8px", flexWrap: "wrap" }}>
+      {steps.map((s, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: "50%",
+              background: i < current ? C.primary : i === current ? C.deep : C.white,
+              border: i <= current ? "none" : `1.5px solid ${C.border}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+              color: i <= current ? C.white : C.muted,
+              transition: "all 0.3s ease",
+            }}>
+              {i < current ? (
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7.5L6 10.5L11 4" stroke={C.white} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              ) : i + 1}
+            </div>
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: i === current ? C.deep : C.muted, fontWeight: i === current ? 500 : 400, whiteSpace: "nowrap" }}>{s}</span>
+          </div>
+          {i < 2 && <div style={{ width: 48, height: 1, background: i < current ? C.primary : C.border, margin: "0 16px", transition: "background 0.3s ease" }} />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Step1({ formData, setFormData, onNext }) {
+  const moveTypes = [
+    { label: "Moving to NC", desc: "Out-of-state buyer relocating to the Triangle" },
+    { label: "Leaving NC", desc: "Selling your Triangle home, moving out of state" },
+    { label: "Moving within NC", desc: "Relocating within the Triangle market" },
+  ];
+
+  const update = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
+
+  const canProceed =
+    formData.tier &&
+    formData.address.length > 5 &&
+    formData.name.length > 2 &&
+    formData.email.includes("@");
+
+  const selectedTier = TIERS.find(t => t.id === formData.tier);
+
+  return (
+    <div>
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep, margin: "0 0 8px", fontWeight: 400 }}>Tell us about your move</h2>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted, margin: 0 }}>Choose your service tier and we&apos;ll identify every provider at your address.</p>
+      </div>
+
+      {/* TIER SELECTION */}
+      <div style={{ marginBottom: 32 }}>
+        <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 12 }}>Choose your service tier</label>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {TIERS.map((t) => {
+            const selected = formData.tier === t.id;
+            return (
+              <div
+                key={t.id}
+                onClick={() => update("tier", t.id)}
+                style={{
+                  position: "relative",
+                  padding: "20px 18px",
+                  borderRadius: 12,
+                  border: `1.5px solid ${selected ? C.primary : C.border}`,
+                  background: selected ? C.light : C.white,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {t.recommended && (
+                  <div style={{ position: "absolute", top: -10, right: 14, background: C.amber, color: C.white, fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: "0.08em", padding: "3px 10px", borderRadius: 4 }}>
+                    MOST POPULAR
+                  </div>
+                )}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <Radio selected={selected} />
+                  <div style={{ fontFamily: "Georgia, serif", fontSize: 18, color: C.deep }}>{t.name}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 6 }}>
+                  <span style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep }}>${t.price}</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted }}>flat fee</span>
+                </div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{t.tagline}</div>
+              </div>
+            );
+          })}
+        </div>
+        {selectedTier && (
+          <div style={{ marginTop: 14, padding: "12px 16px", background: C.parchment, borderRadius: 8 }}>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid, fontWeight: 500, letterSpacing: "0.08em", marginBottom: 8 }}>WHAT&apos;S INCLUDED</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {selectedTier.includes.map((item, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke={C.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 10 }}>What type of move?</label>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {moveTypes.map((m, i) => (
+            <div key={i} onClick={() => update("moveType", i)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 10, border: `1.5px solid ${formData.moveType === i ? C.primary : C.border}`, background: formData.moveType === i ? C.light : C.white, cursor: "pointer", transition: "all 0.15s ease" }}>
+              <Radio selected={formData.moveType === i} />
+              <div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>{m.label}</div>
+                <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginTop: 1 }}>{m.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>{formData.moveType === 1 ? "Current address (to disconnect)" : "New address (to activate)"}</label>
+        <input value={formData.address} onChange={e => update("address", e.target.value)} placeholder="123 Main St, Durham, NC 27701" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Full name</label>
+          <input value={formData.name} onChange={e => update("name", e.target.value)} placeholder="Jane Smith" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+        </div>
+        <div>
+          <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Email</label>
+          <input value={formData.email} onChange={e => update("email", e.target.value)} placeholder="jane@example.com" type="email" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Phone</label>
+          <input value={formData.phone} onChange={e => update("phone", e.target.value)} placeholder="(919) 555-0172" type="tel" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+        </div>
+        <div>
+          <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Closing date (approximate)</label>
+          <input value={formData.closing} onChange={e => update("closing", e.target.value)} type="date" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 10 }}>Preferred communication channel</label>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {["WhatsApp", "SMS", "Email"].map((ch, i) => (
+            <button key={i} onClick={() => update("comm", i)} style={{ padding: "10px 20px", borderRadius: 8, border: `1.5px solid ${formData.comm === i ? C.primary : C.border}`, background: formData.comm === i ? C.light : C.white, fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: formData.comm === i ? 500 : 400, color: formData.comm === i ? C.deep : C.muted, cursor: "pointer", transition: "all 0.15s ease" }}>{ch}</button>
+          ))}
+        </div>
+      </div>
+
+      {formData.address.length > 5 && (
+        <div style={{ background: C.light, borderRadius: 10, padding: "16px 20px", marginBottom: 28, transition: "all 0.3s ease" }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid, fontWeight: 500, letterSpacing: "0.08em", marginBottom: 10 }}>PROVIDERS DETECTED AT YOUR ADDRESS</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {(formData.tier === "essentials"
+              ? ["Google Fiber", "AT&T Fiber", "Spectrum"]
+              : ["Duke Energy", "Piedmont Gas", "Durham Water", "Google Fiber", "AT&T Fiber", "Spectrum"]
+            ).map((p, i) => (
+              <span key={i} style={{ padding: "5px 12px", borderRadius: 6, background: C.white, border: `1px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.ink }}>{p}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button onClick={canProceed ? onNext : undefined} style={{ width: "100%", padding: "14px", borderRadius: 8, background: canProceed ? C.deep : C.border, color: canProceed ? C.white : C.muted, border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: canProceed ? "pointer" : "default", transition: "all 0.2s ease" }}>
+        {selectedTier ? `Continue to payment — $${selectedTier.price}` : "Continue to payment"}
+      </button>
+    </div>
+  );
+}
+
+// Inner payment form — must be rendered inside <Elements> to access Stripe context.
+function PaymentForm({ formData, onSuccess, onBack, amount, label }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setProcessing(true);
+    setErrorMessage(null);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        // Stripe needs a return_url for redirect-based methods (e.g. Cash App, Klarna).
+        // For card payments this won't actually redirect — Stripe stays on-page.
+        return_url: `${window.location.origin}/get-started?payment=success`,
+        receipt_email: formData.email,
+      },
+      redirect: "if_required",
+    });
+
+    if (error) {
+      setErrorMessage(error.message || "Payment failed. Please try again.");
+      setProcessing(false);
+      return;
+    }
+
+    if (paymentIntent && paymentIntent.status === "succeeded") {
+      onSuccess();
+    } else {
+      // Edge case: payment requires action handled by Stripe's redirect flow
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: C.ink }}>Order summary</div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.muted, display: "flex", alignItems: "center", gap: 6 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L2 4v4c0 3.5 2.1 6.4 5 7 2.9-.6 5-3.5 5-7V4L7 1z" stroke={C.primary} strokeWidth="1" strokeLinejoin="round"/></svg>
+            Secured by Stripe
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 0", borderBottom: `1px solid ${C.border}` }}>
+          <div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink }}>{label}</div>
+            <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginTop: 2 }}>One-time service fee</div>
+          </div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>${(amount / 100).toFixed(2)}</div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 0", borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted }}>Processing fee</div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted }}>$0.00</div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 0" }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, color: C.deep }}>Total</div>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: 24, color: C.deep }}>${(amount / 100).toFixed(2)}</div>
+        </div>
+      </div>
+
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px", marginBottom: 24 }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, marginBottom: 16 }}>Payment details</div>
+        <PaymentElement options={{ layout: "tabs" }} />
+      </div>
+
+      {errorMessage && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 16px", marginBottom: 16, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#991B1B" }}>
+          {errorMessage}
+        </div>
+      )}
+
+      <div style={{ background: C.light, borderRadius: 10, padding: "14px 18px", marginBottom: 24, display: "flex", alignItems: "flex-start", gap: 12 }}>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
+          <circle cx="9" cy="9" r="7.5" stroke={C.mid} strokeWidth="1.2"/>
+          <path d="M9 5.5v4" stroke={C.mid} strokeWidth="1.2" strokeLinecap="round"/>
+          <circle cx="9" cy="12.5" r="0.6" fill={C.mid}/>
+        </svg>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.mid, lineHeight: 1.6 }}>Your ISP scheduling begins immediately after payment. Utility activations begin after you complete the e-sign authorization in the next step.</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <button type="button" onClick={onBack} disabled={processing} style={{ padding: "14px 24px", borderRadius: 8, background: C.white, color: C.ink, border: `1px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: processing ? "default" : "pointer", opacity: processing ? 0.5 : 1 }}>Back</button>
+        <button type="submit" disabled={processing || !stripe} style={{ flex: 1, padding: "14px", borderRadius: 8, background: processing ? C.mid : C.deep, color: C.white, border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: processing ? "default" : "pointer", transition: "all 0.2s ease" }}>
+          {processing ? "Processing…" : `Pay $${(amount / 100).toFixed(2)}`}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// Outer Step2 — fetches the PaymentIntent client_secret from our API, then mounts <Elements>.
+function Step2({ formData, onNext, onBack }) {
+  const [clientSecret, setClientSecret] = useState(null);
+  const [paymentMeta, setPaymentMeta] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function createIntent() {
+      try {
+        const res = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tier: formData.tier,
+            email: formData.email,
+            name: formData.name,
+            moveType: ["moving_to_nc", "leaving_nc", "within_nc"][formData.moveType] || "",
+            address: formData.address,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Could not start payment");
+        if (!cancelled) {
+          setClientSecret(data.clientSecret);
+          setPaymentMeta({ amount: data.amount, label: data.label });
+        }
+      } catch (err) {
+        if (!cancelled) setFetchError(err.message);
+      }
+    }
+    createIntent();
+    return () => { cancelled = true; };
+  }, [formData.tier, formData.email, formData.name, formData.moveType, formData.address]);
+
+  const appearance = useMemo(() => ({
+    theme: "stripe",
+    variables: {
+      colorPrimary: C.primary,
+      colorBackground: C.white,
+      colorText: C.ink,
+      colorDanger: "#991B1B",
+      fontFamily: "DM Sans, system-ui, sans-serif",
+      borderRadius: "8px",
+    },
+  }), []);
+
+  return (
+    <div>
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep, margin: "0 0 8px", fontWeight: 400 }}>Payment</h2>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted, margin: 0 }}>Secure checkout via Stripe. Your card information never touches our servers.</p>
+      </div>
+
+      {fetchError && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "16px 20px", marginBottom: 20, fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#991B1B" }}>
+          {fetchError}
+          <div style={{ marginTop: 12 }}>
+            <button onClick={onBack} style={{ padding: "10px 20px", borderRadius: 8, background: C.white, color: C.ink, border: `1px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>Back</button>
+          </div>
+        </div>
+      )}
+
+      {!fetchError && !clientSecret && (
+        <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "48px 24px", textAlign: "center", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted }}>
+          Preparing secure checkout…
+        </div>
+      )}
+
+      {clientSecret && stripePromise && (
+        <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+          <PaymentForm
+            formData={formData}
+            onSuccess={onNext}
+            onBack={onBack}
+            amount={paymentMeta.amount}
+            label={paymentMeta.label}
+          />
+        </Elements>
+      )}
+
+      {clientSecret && !stripePromise && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "16px 20px", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#991B1B" }}>
+          Stripe publishable key not configured. Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in your environment.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Step3({ onBack }) {
+  const [check1, setCheck1] = useState(false);
+  const [check2, setCheck2] = useState(false);
+  const [dl, setDl] = useState("");
+  const [ssn, setSsn] = useState("");
+  const [signed, setSigned] = useState(false);
+
+  const canSign = check1 && check2 && dl.length > 4 && ssn.length > 4;
+
+  const handleSign = () => {
+    if (canSign) setSigned(true);
+  };
+
+  if (signed) {
+    return (
+      <div style={{ textAlign: "center", padding: "3rem 0" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.primary, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 15L12 21L22 8" stroke={C.white} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </div>
+        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep, margin: "0 0 12px", fontWeight: 400 }}>You&apos;re all set.</h2>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: C.ink, lineHeight: 1.7, margin: "0 0 24px", maxWidth: 440, marginLeft: "auto", marginRight: "auto" }}>Your authorization is signed. We&apos;re redirecting you to Notarize.com to complete identity verification — it takes about 5 minutes on your phone.</p>
+
+        <div style={{ background: C.light, borderRadius: 12, padding: "20px 24px", maxWidth: 400, margin: "0 auto 28px", textAlign: "left" }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid, fontWeight: 500, letterSpacing: "0.08em", marginBottom: 14 }}>WHAT HAPPENS NEXT</div>
+          {[
+            { label: "ISP scheduling", status: "In progress", color: C.amber },
+            { label: "Notarize.com verification", status: "Action needed", color: C.amber },
+            { label: "Utility activations", status: "Waiting on notarization", color: C.muted },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderTop: i > 0 ? `1px solid ${C.border}` : "none" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink }}>{item.label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 7, height: 7, borderRadius: "50%", background: item.color }} />
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: item.color, fontWeight: 500 }}>{item.status}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button style={{ background: C.deep, color: C.white, border: "none", borderRadius: 8, padding: "14px 36px", fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: "pointer" }}>Continue to Notarize.com</button>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginTop: 12 }}>You&apos;ll also receive a WhatsApp message with this link.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <h2 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: C.deep, margin: "0 0 8px", fontWeight: 400 }}>Authorize Verity to act on your behalf</h2>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.muted, margin: 0 }}>This is a limited Task Authorization — not a power of attorney. Review each item and check to confirm.</p>
+      </div>
+
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: "28px 24px", marginBottom: 24 }}>
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.primary, letterSpacing: "0.1em", fontWeight: 500, marginBottom: 20 }}>TASK AUTHORIZATION AGREEMENT</div>
+
+        <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: C.ink, lineHeight: 1.7, marginBottom: 20, padding: "16px 20px", background: C.parchment, borderRadius: 8 }}>
+          I, the undersigned, authorize Verity Relocation (a DBA of Verity Agentic Services LLC) to contact utility and internet service providers on my behalf for the purpose of activating, disconnecting, or transferring services at the address provided. This authorization is executed under the Uniform Electronic Transactions Act (UETA) and is subject to a 24-hour revocation clause.
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
+          <div onClick={() => setCheck1(!check1)} style={{ display: "flex", alignItems: "flex-start", gap: 14, cursor: "pointer", padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${check1 ? C.primary : C.border}`, background: check1 ? C.light : C.white, transition: "all 0.15s ease" }}>
+            <Check checked={check1} />
+            <div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>Authorize utility provider contact</div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginTop: 4, lineHeight: 1.5 }}>I authorize Verity Relocation to contact Duke Energy, Piedmont Natural Gas, and my city water department to activate, disconnect, or transfer service on my behalf.</div>
+            </div>
+          </div>
+
+          <div onClick={() => setCheck2(!check2)} style={{ display: "flex", alignItems: "flex-start", gap: 14, cursor: "pointer", padding: "14px 16px", borderRadius: 10, border: `1.5px solid ${check2 ? C.primary : C.border}`, background: check2 ? C.light : C.white, transition: "all 0.15s ease" }}>
+            <Check checked={check2} />
+            <div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, color: C.ink }}>Authorize internet service scheduling</div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, marginTop: 4, lineHeight: 1.5 }}>I authorize Verity Relocation to schedule internet service installation with Google Fiber, AT&T Fiber, or Spectrum on my behalf.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ background: C.parchment, borderRadius: 10, padding: "20px", marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4.5v4c0 3.25 2.5 6.3 6 7 3.5-.7 6-3.75 6-7v-4L8 1z" stroke={C.mid} strokeWidth="1.2" strokeLinejoin="round"/></svg>
+            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.mid, fontWeight: 500, letterSpacing: "0.08em" }}>IDENTITY VERIFICATION — ENCRYPTED VAULT</span>
+          </div>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.muted, lineHeight: 1.6, marginBottom: 16 }}>Utility providers like Duke Energy require identity verification to activate service. Your SSN and driver&apos;s license number are stored in an encrypted PII vault and automatically purged 24 hours after your engagement is complete. This data never enters our standard database.</div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 0 }}>
+            <div>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Social Security number</label>
+              <input value={ssn} onChange={e => setSsn(e.target.value)} placeholder="XXX-XX-XXXX" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box", letterSpacing: "0.05em" }}/>
+            </div>
+            <div>
+              <label style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500, color: C.ink, display: "block", marginBottom: 6 }}>Driver&apos;s license number</label>
+              <input value={dl} onChange={e => setDl(e.target.value)} placeholder="License number" style={{ width: "100%", padding: "12px 16px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: C.ink, outline: "none", background: C.white, boxSizing: "border-box" }}/>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ background: C.light, borderRadius: 8, padding: "12px 16px", display: "flex", alignItems: "flex-start", gap: 10 }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
+            <path d="M8 1L2 4.5v4c0 3.25 2.5 6.3 6 7 3.5-.7 6-3.75 6-7v-4L8 1z" stroke={C.mid} strokeWidth="1.2" strokeLinejoin="round"/>
+          </svg>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: C.mid, lineHeight: 1.5 }}>This authorization includes a 24-hour revocation clause. You may revoke at any time within 24 hours for a full refund. SSN and DL stored via Skyflow encrypted vault — never in our application database.</div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <button onClick={onBack} style={{ padding: "14px 24px", borderRadius: 8, background: C.white, color: C.ink, border: `1px solid ${C.border}`, fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: "pointer" }}>Back</button>
+        <button onClick={handleSign} style={{ flex: 1, padding: "14px", borderRadius: 8, background: canSign ? C.deep : C.border, color: canSign ? C.white : C.muted, border: "none", fontFamily: "'DM Sans', sans-serif", fontSize: 15, fontWeight: 500, cursor: canSign ? "pointer" : "default", transition: "all 0.2s ease" }}>
+          Sign authorization
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function IntakeFlow() {
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState({
+    tier: "",
+    moveType: 0,
+    address: "",
+    name: "",
+    email: "",
+    phone: "",
+    closing: "",
+    comm: 0,
+  });
+
+  return (
+    <div style={{ background: C.parchment, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
+      <Nav />
+
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 2rem 4rem" }}>
+        <StepIndicator current={step} />
+
+        <div style={{ marginTop: 32 }}>
+          {step === 0 && <Step1 formData={formData} setFormData={setFormData} onNext={() => setStep(1)} />}
+          {step === 1 && <Step2 formData={formData} onNext={() => setStep(2)} onBack={() => setStep(0)} />}
+          {step === 2 && <Step3 onBack={() => setStep(1)} />}
+        </div>
+
+        <div style={{ marginTop: 40, textAlign: "center" }}>
+          <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: C.muted, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+            <span>Encrypted PII vault</span>
+            <span style={{ color: C.border }}>|</span>
+            <span>PCI SAQ A compliant</span>
+            <span style={{ color: C.border }}>|</span>
+            <span>24-hour revocation</span>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
   );
 }
